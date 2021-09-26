@@ -1,0 +1,84 @@
+Nov.17.2015 ACCESS Co.,Ltd.
+    * cairo-tor-scan-converter.c
+    workaround: forcely crash if allocation failed.
+
+Feb.28.2014 ACCESS Co.,Ltd.
+    * src/cairo.c
+    * src/cairo-image-source.c
+    add: added feature of reset variables.
+
+Feb.09.2015 ACCESS Co.,Ltd.
+    * cairo-image-compositor.c
+    add: added guard.
+
+Sep.09.2014 ACCESS Co.,Ltd.
+    * src/cairo.c:
+    * src/cairo-error.c:
+    * src/cairo-error-private.h:
+    * src/cairo-gl-private.h:
+    * src/cairoint.h:
+    mod: disabled asserts
+
+Jan.14.2014 ACCESS Co.,Ltd.
+    * src/cairo.h:
+    fix: add a dummy value to enum _cairo_surface_type.
+
+May.16.2013 ACCESS Co.,Ltd.
+    * src/cairo.h:
+    * src/cairo-image-surface.c:
+    (cairo_image_surface_swap_data):
+    fix: fixed build errors caused by "Jan.07.2013 ACCESS Co.,Ltd.".
+
+May.16.2013 ACCESS Co.,Ltd.
+    * src/cairo-image-compositor.c
+    merge: Apply the following patch from the central repository.
+        ----
+        2013-02-19
+        image: Compare against the true size of the embedded buffer
+        Chris Wilson
+        http://cgit.freedesktop.org/cairo/commit/?id=e7e1ac235ff94d184d88c8c206b81343822f6a4e
+
+May.15.2013 ACCESS Co.,Ltd.
+    * src/cairo-image-compositor.c
+    fix: avoid both a crash and a compiler problem.
+
+Jan.07.2013 ACCESS Co.,Ltd.
+    * src/cairo.h:
+    * src/cairo-image-surface.c:
+    (cairo_image_surface_swap_data):
+    add: added #ifdef directive for the patch of "Oct.04.2012 ACCESS Co.,Ltd".
+
+Oct.17.2012 ACCESS Co.,Ltd.
+    * src/cairo-image-compositor.c
+    * src/cairo-misc.c
+    * src/cairo-scaled-font.c
+    * src/cairo-toy-font-face.c
+    * src/cairo.c
+    add: added feature of reset variables.
+
+Oct.16.2012 ACCESS Co.,Ltd.
+    * src/cairo-features.h:
+    add: added rename headers.
+
+Oct.04.2012 ACCESS Co.,Ltd.
+    * src/cairo.h:
+    * src/cairo-image-surface.c:
+    (cairo_image_surface_swap_data):
+    add: function added change surface data and pixman bits.
+
+Oct.01.2012 ACCESS Co.,Ltd.
+    * src/cairo-image-compositor.c:
+    (inplace_renderer_init):
+    fix: reference leak; clear unref'ed pointer.
+
+Sep.27.2012 ACCESS Co.,Ltd.
+    * src/cairo-image-compositor.c:
+    (fill_rectangles):
+    (fill_boxes):
+    (composite_boxes):
+    fix: added error check.
+
+Aug.14.2012 ACCESS Co.,Ltd.
+    * src/cairo-spans-compositor.c: 
+    (get_clip_surface):
+    fix: added error check.
