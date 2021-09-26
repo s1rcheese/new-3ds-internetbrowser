@@ -1,0 +1,238 @@
+/*
+ * Copyright (C) 2008 Gustavo Noronha Silva
+ * Copyright (c) 2010-2013 ACCESS CO., LTD. All rights reserved.
+ *
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2 of the License, or (at your option) any later version.
+ *
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
+#include "config.h"
+#include "InspectorClientWKC.h"
+#if ENABLE(INSPECTOR_SERVER)
+#include "InspectorServerClientWKC.h"
+#endif
+
+#include "WKCOverlayPrivate.h"
+
+#include "Frame.h"
+#include "FrameView.h"
+#include "Page.h"
+#include "InspectorController.h"
+#include "Node.h"
+#include "RenderObject.h"
+#include "RenderStyle.h"
+
+
+#include "WKCWebViewPrivate.h"
+
+#include "helpers/InspectorClientIf.h"
+
+#include "Frame.h"
+#include "FrameView.h"
+#include "Page.h"
+#include "WTFString.h"
+
+// implementations
+
+namespace WKC {
+
+InspectorClientWKC::InspectorClientWKC(WKCWebViewPrivate* view)
+     : m_view(view),
+       m_appClient(0),
+       m_inspectedWebView(0),
+       m_webInspector(0)
+#if ENABLE(INSPECTOR_SERVER)
+       , m_inspectorServerClient(0)
+#endif
+{
+}
+InspectorClientWKC::~InspectorClientWKC()
+{
+    if (m_appClient) {
+        if (m_view) {
+            m_view->clientBuilders().deleteInspectorClient(m_appClient);
+        } else {
+            // Ugh!: no way to destroy!
+        }
+    }
+}
+
+InspectorClientWKC*
+InspectorClientWKC::create(WKCWebViewPrivate* view)
+{
+    InspectorClientWKC* self = 0;
+    self = new InspectorClientWKC(view);
+    if (!self) {
+        return 0;
+    }
+    if (!self->construct()) {
+        delete self;
+        return 0;
+    }
+    return self;
+}
+
+bool
+InspectorClientWKC::construct()
+{
+    m_appClient = m_view->clientBuilders().createInspectorClient(m_view->parent());
+    if (!m_appClient) return false;
+    return true;
+}
+
+void
+InspectorClientWKC::webViewDestroyed()
+{
+    m_view = 0;
+}
+void
+InspectorClientWKC::inspectorDestroyed()
+{
+    delete this;
+}
+
+WebCore::Page*
+InspectorClientWKC::createPage()
+{
+    return 0;
+}
+
+WTF::String
+InspectorClientWKC::localizedStringsURL()
+{
+    return WTF::String();
+}
+
+WTF::String
+InspectorClientWKC::hiddenPanels()
+{
+    return WTF::String();
+}
+
+void
+InspectorClientWKC::showWindow()
+{
+}
+
+void
+InspectorClientWKC::closeWindow()
+{
+}
+
+void
+InspectorClientWKC::attachWindow()
+{
+}
+
+void
+InspectorClientWKC::detachWindow()
+{
+}
+
+void
+InspectorClientWKC::setAttachedWindowHeight(unsigned height)
+{
+}
+
+void
+InspectorClientWKC::highlight()
+{
+#if ENABLE(INSPECTOR)
+    int fixedDirectionFlag = EFixedDirectionNone;
+
+    WebCore::InspectorController* controller = m_view->core()->inspectorController();
+    if (controller && controller->enabled()) {
+        WebCore::Node* node = controller->highlightedNode();
+        if (node && node->renderer()) {
+            WebCore::RenderStyle* style = node->renderer()->style();
+            if (style->position() == WebCore::FixedPosition) {
+                fixedDirectionFlag |= style->left().isSpecified() ? EFixedDirectionLeft : 0;
+                fixedDirectionFlag |= style->right().isSpecified() ? EFixedDirectionRight : 0;
+                fixedDirectionFlag |= style->top().isSpecified() ? EFixedDirectionTop : 0;
+                fixedDirectionFlag |= style->bottom().isSpecified() ? EFixedDirectionBottom : 0;
+            }
+        }
+    }
+    m_view->addOverlay(this, 0, fixedDirectionFlag);
+#endif
+}
+
+void
+InspectorClientWKC::hideHighlight()
+{
+    m_view->removeOverlay(this);
+}
+
+void
+InspectorClientWKC::paintOverlay(WebCore::GraphicsContext& ctx)
+{
+#if ENABLE(INSPECTOR)
+    WebCore::Frame* frame = m_view->core()->mainFrame();
+    if (frame && frame->view()) {
+        WebCore::InspectorController* controller = m_view->core()->inspectorController();
+        if (controller && controller->enabled())
+            controller->drawHighlight(ctx);
+    }
+#endif
+}
+
+void
+InspectorClientWKC::inspectedURLChanged(const WTF::String& newURL)
+{
+}
+
+void
+InspectorClientWKC::populateSetting(const WTF::String& key, WTF::String* value)
+{
+}
+
+void
+InspectorClientWKC::storeSetting(const WTF::String& key, const WTF::String& value)
+{
+}
+
+void
+InspectorClientWKC::inspectorWindowObjectCleared()
+{
+}
+
+void
+InspectorClientWKC::openInspectorFrontend(WebCore::InspectorController *)
+{
+}
+
+void
+InspectorClientWKC::closeInspectorFrontend()
+{
+}
+
+void
+InspectorClientWKC::bringFrontendToFront()
+{
+}
+
+bool
+InspectorClientWKC::sendMessageToFrontend(const WTF::String& message)
+{
+#if ENABLE(INSPECTOR_SERVER)
+    if (m_inspectorServerClient && m_inspectorServerClient->hasRemoteFrontendConnected()) {
+        m_inspectorServerClient->sendMessageToRemoteFrontend(message);
+        return true;
+    }
+#endif
+
+    return false;
+}
+
+} // namespace
