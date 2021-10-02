@@ -5,4 +5,6 @@ The Internet Browser for Nintendo 3DS includes OSS distributed under OSS License
 
 Source code from Nintendo of Japan's website [here](https://www.nintendo.co.jp/support/oss/index.html). This verison used is "[JP/US/EU/KR 11.9.0 ～](https://www.nintendo.co.jp/support/oss/data/NewNintendo3DS_OpenSources11.9.0-.zip)".
 
+There is a tree [here](https://github.com/s1rcheese/new-3ds-internetbrowser/tree/build) to expirement a way to build the browser.
+
 [Internet Browser specifications](http://www.nintendo.com/3ds/internetbrowser/specs)
